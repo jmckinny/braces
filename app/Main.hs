@@ -1,5 +1,7 @@
 module Main where
 import Data.List (delete)
+import System.Environment (getArgs)
+import System.IO ( hGetContents,openFile, IOMode(ReadMode) )
 
 data Data = Brace Brace | Char Char 
     deriving (Show, Eq)
@@ -40,8 +42,19 @@ matching x =
     CloseSqr -> OpenSqr
     CloseCurly -> OpenCurly
 
+validate :: String -> IO ()
+validate input = if validBraces input then putStrLn "Valid" else putStrLn "Invalid"
 
 main :: IO ()
 main = do
-    input <- getContents
-    if validBraces input then putStrLn "Valid" else putStrLn"Invalid"
+    args <- getArgs
+    if not (null args) then 
+        do
+            handle <- openFile (head args) ReadMode
+            input <- hGetContents handle
+            validate input
+    else 
+        do
+            input <- getContents
+            validate input
+            
